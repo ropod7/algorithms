@@ -1,44 +1,54 @@
-# /usr/bin/env python3
+#!/usr/bin/env/python
+
+# In this script using Divide & Conquer paradigm at this moment, to 
+# sort and count number of split inversions in unsorted list object by 
+# recursive call
 
 import os
-from math import log
 
-class SplitInversions(object):
-    inversions = 0
-    sortedOut = []
-    
+class Merge(object):
     def __init__(self, obj):
         self.obj = obj
-        self.sortedIn = sorted(obj) # defined to compare result
         self.largest = max(obj)     # to define over value in merge sort
         
-    def run(self):
-        self.sortedOut = self.split(self.obj)
-
     def merge(self, a, b, lenl):
-        d = []
+        output = []
         i = j = si = 0  # si is split inversions
         over = self.largest + 1
         for k in range(lenl):
             A = a[i] if i != len(a) else over
             B = b[j] if j != len(b) else over
             if A < B:
-                d.append(A)
+                output.append(A)
                 i += 1
             else:
-                d.append(B)
+                output.append(B)
                 j += 1            
                 si += len(a) - i
-            
+        return output, si
+
+class SplitInversions(Merge):
+    inversions = 0
+    sortedOut = []
+    
+    def __init__(self, obj):
+        super(SplitInversions, self).__init__(obj)
+        self.sortedIn = sorted(obj) # defined to compare output result
+        
+    def run(self):
+        self.sortedOut = self.split(self.obj)
+        
+    def merge(self, *args):
+        output, si = super(SplitInversions, self).merge(*args)
         self.inversions += si
-        return d
+        return output
 
     def split(self, lines):
         lenl = len(lines)
         if lenl == 1: return 0 
         a, b = lines[:lenl/2], lines[lenl/2:]
-        a = self.split(a) if len(a) > 1 else a
-        b = self.split(b) if len(b) > 1 else b
+        a = self.split(a) if len(a) > 1 else a  # recursive call for 1 half
+        b = self.split(b) if len(b) > 1 else b  # recursive call for 2 half
         d = self.merge(a, b, lenl)
         return d
         
@@ -48,8 +58,11 @@ class SplitInversions(object):
         return data
 
 if __name__ == '__main__':
-    lines = [1, 3, 0, 10, 23, 11, 6, 5, 2, 9, 4, 8, 7, 12]
+    with open('/path_to_unsorted/IntegerArray.txt') as f:
+        lines = map(int, f.readlines())
+        
     si = SplitInversions(lines)
     si.run()
     print si.repr_results()
+    #print si.sortedOut
 
