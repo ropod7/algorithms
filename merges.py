@@ -1,4 +1,4 @@
-#!/usr/bin/env/python
+#!/usr/bin/env/python3
 
 # In this script using Divide & Conquer paradigm at this moment, to 
 # sort and count number of split inversions in unsorted list object by 
@@ -13,7 +13,7 @@ class Merge(object):
         
     def merge(self, a, b, lenl):
         output = []
-        i = j = si = 0  # si is split inversions
+        i = j = si = 0              # si is split inversions
         over = self.largest + 1
         for k in range(lenl):
             A = a[i] if i != len(a) else over
@@ -33,7 +33,7 @@ class SplitInversions(Merge):
     
     def __init__(self, obj):
         super(SplitInversions, self).__init__(obj)
-        self.sortedIn = sorted(obj) # defined to compare output result
+        self.sortedIn = sorted(obj)     # defined to compare output result
         
     def run(self):
         self.sortedOut = self.split(self.obj)
@@ -43,10 +43,10 @@ class SplitInversions(Merge):
         self.inversions += si
         return output
 
-    def split(self, lines):
-        lenl = len(lines)
+    def split(self, obj):
+        lenl = len(obj)
         if lenl == 1: return 0 
-        a, b = lines[:lenl/2], lines[lenl/2:]
+        a, b = obj[:lenl//2], obj[lenl//2:]
         a = self.split(a) if len(a) > 1 else a  # recursive call for 1 half
         b = self.split(b) if len(b) > 1 else b  # recursive call for 2 half
         d = self.merge(a, b, lenl)
@@ -59,10 +59,9 @@ class SplitInversions(Merge):
 
 if __name__ == '__main__':
     with open('/path_to_unsorted/IntegerArray.txt') as f:
-        lines = map(int, f.readlines())
-        
+        lines = list(map(int, f.readlines()))
+    
     si = SplitInversions(lines)
     si.run()
-    print si.repr_results()
-    #print si.sortedOut
+    print(si.repr_results())
 
