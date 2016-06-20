@@ -1,8 +1,8 @@
 #!/usr/bin/env/python3
 
-# In this script using Divide & Conquer paradigm at this moment, to 
-# sort and count number of split inversions in unsorted list object by 
-# recursive call
+# In this script case using Divide & Conquer paradigm (at this moment), 
+# to sort and count number of split inversions in unsorted list object 
+# by Recursive Tree and Merge Sort algorithms
 
 import os
 
@@ -47,8 +47,8 @@ class SplitInversions(Merge):
         lenl = len(obj)
         if lenl == 1: return 0 
         a, b = obj[:lenl//2], obj[lenl//2:]
-        a = self.split(a) if len(a) > 1 else a  # recursive call for 1 half
-        b = self.split(b) if len(b) > 1 else b  # recursive call for 2 half
+        a = self.split(a) if len(a) > 1 else a  # recursive call for 1st half
+        b = self.split(b) if len(b) > 1 else b  # recursive call for 2nd half
         d = self.merge(a, b, lenl)
         return d
         
