@@ -27,6 +27,12 @@ class BaseSort(object):
         data = 'List is sorted: {0}'.format(is_sorted)
         return data
 
+    def _recursive_comb(self, a, b):
+        a = self._recursiveSort(a) if len(a) > 1 else a  # recursive call for 1st half
+        b = self._recursiveSort(b) if len(b) > 1 else b  # recursive call for 2nd half
+        return a, b
+
+# running time is O(nlog(n))
 class MergeSort(BaseSort):
 
     def _get_value(self, obj, i):
@@ -54,8 +60,7 @@ class MergeSort(BaseSort):
         n = len(obj)
         if n == 1: return 0
         a, b = self._split(obj, n)
-        a = self._recursiveSort(a) if len(a) > 1 else a  # recursive call for 1st half
-        b = self._recursiveSort(b) if len(b) > 1 else b  # recursive call for 2nd half
+        a, b = self._recursive_comb(a, b)
         d = self._merge(a, b, n, si)
         return d
 
@@ -70,6 +75,8 @@ class SplitInversions(MergeSort):
         data += '\nSplit inversions: {0}'.format(self.inversions)
         return data
 
+# running time is O(nlog(n))
+# can't apply Master Method [random, unbalanced subproblems]
 class QuickSort(BaseSort):
 
     def _swap(self, item0, item1):
@@ -82,29 +89,26 @@ class QuickSort(BaseSort):
         return obj
 
     def _recursiveSort(self, obj):
-        self.obj = obj
         n = len(obj)
         if n == 1: return
-        obj = self._choose_pivot(obj)
-        pivot = obj[0]
-        obj = self._partitionSort(obj, pivot, n)
-        index = obj.index(pivot)                            # get index of current pos of pivot
-        a, b = obj[:index], obj[index+1:]                   # split partitions around pivot
-        obj[:index]   = self._recursiveSort(a) if len(a) > 1 else a
-        obj[index+1:] = self._recursiveSort(b) if len(b) > 1 else b
+        obj = self._choose_pivot(obj)             # every pivot compared in input array exactly once
+        obj, index = self._partitionSort(obj, n)
+        a, b = obj[:index], obj[index+1:]         # split partitions around pivot
+        obj[:index], obj[index+1:] = self._recursive_comb(a, b)
         return obj
 
-    def _partitionSort(self, obj, pivot, n):
+    def _partitionSort(self, obj, n):
         i = 1
+        pivot = obj[0]
         for j in range(1, n):
             if obj[j] < pivot:
                 obj[j], obj[i] = self._swap(obj[j], obj[i])
                 i += 1
         obj[0], obj[i-1] = self._swap(obj[0], obj[i-1])
-        return obj
+        return obj, i-1
 
 if __name__ == '__main__':
-    with open('IntegerArray.txt') as f:
+    with open('/media/roman/100GB/Downloads/IntegerArray.txt') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [1,5,8,2,6,9,4,7,3,11,14,10,12,13]
