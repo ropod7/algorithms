@@ -1,7 +1,7 @@
 #!/usr/bin/env/python3
 
 # In this script case using Divide & Conquer paradigm, to:
-# 1. Sort lists objects (MergeSort, QuickSort, SplitInversions) and
+# 1. Sort list objects (MergeSort, QuickSort, SplitInversions) and
 # 2. Count number of SplitInversions in unsorted list object
 # by RecursiveTree, MergeSort and QuickSort algorithms
 
@@ -14,7 +14,7 @@ class MergeSort(object):
 
     def __init__(self, obj):
         self.obj = obj
-        self.largest = max(obj)         # to define over value in merge sort
+        self.over = max(obj) + 1         # to define over value in merge sort
         self.sortedIn = sorted(obj)     # defined to compare output result
 
     def sort(self):
@@ -22,22 +22,21 @@ class MergeSort(object):
         self.sortedOut = self._recursiveSort(self.obj)
         print('executed at:', datetime.datetime.now()-time)
 
+    def _get_value(self, obj, i):
+        return obj[i] if i != len(obj) else self.over
+
     def _merge(self, a, b, lenl):
         output = []
         i = j = 0
-        over = self.largest + 1
         for k in range(lenl):
-            A = a[i] if i != len(a) else over
-            B = b[j] if j != len(b) else over
+            A = self._get_value(a, i)
+            B = self._get_value(b, j)
             if A < B:
                 output.append(A)
                 i += 1
             else:
                 output.append(B)
                 j += 1
-                try:
-                    self.inversions += len(a) - i
-                except AttributeError: pass
         return output
 
     def _split(self, obj, n):
@@ -59,6 +58,22 @@ class MergeSort(object):
 
 class SplitInversions(MergeSort):
     inversions = 0
+
+    def _merge(self, a, b, lenl):
+        output = []
+        i = j = 0
+        len_a = len(a)
+        for k in range(lenl):
+            A = self._get_value(a, i)
+            B = self._get_value(b, j)
+            if A < B:
+                output.append(A)
+                i += 1
+            else:
+                output.append(B)
+                j += 1
+                self.inversions += len_a - i
+        return output
 
     def repr_results(self):
         data = super(SplitInversions, self).repr_results()
@@ -99,7 +114,7 @@ class QuickSort(MergeSort):
         return obj
 
 if __name__ == '__main__':
-    with open('/path_to_unsorted/IntegerArray.txt') as f:
+    with open('IntegerArray.txt') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [1,5,8,2,6,9,4,7,3,11,14,10,12,13]
