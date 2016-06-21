@@ -108,7 +108,7 @@ class QuickSort(BaseSort):
         return obj, i-1
 
 if __name__ == '__main__':
-    with open('/media/roman/100GB/Downloads/IntegerArray.txt') as f:
+    with open('IntegerArray.txt') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [1,5,8,2,6,9,4,7,3,11,14,10,12,13]
