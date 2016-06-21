@@ -81,15 +81,15 @@ class QuickSort(MergeSort):
         n = len(obj)
         if n == 1: return
         index, pivot = self._choose_pivot(obj)
-        obj[0], obj[index] = self._swap(obj[0], obj[index])
-        obj = self._partition(obj, pivot, n)
-        index = obj.index(pivot)
-        a, b = obj[:index], obj[index+1:]
+        obj[0], obj[index] = self._swap(obj[0], obj[index]) # place pivot to the 0 pos
+        obj = self._partitionSort(obj, pivot, n)
+        index = obj.index(pivot)                            # get index of current pos of pivot
+        a, b = obj[:index], obj[index+1:]                   # split partitions around pivot
         obj[:index]   = self._recursiveSort(a) if len(a) > 1 else a
         obj[index+1:] = self._recursiveSort(b) if len(b) > 1 else b
         return obj
 
-    def _partition(self, obj, pivot, n):
+    def _partitionSort(self, obj, pivot, n):
         i = 1
         for j in range(1, n):
             if obj[j] < pivot:
@@ -99,9 +99,10 @@ class QuickSort(MergeSort):
         return obj
 
 if __name__ == '__main__':
-    with open('/media/roman/100GB/Downloads/IntegerArray.txt') as f:
-    #with open('/path_to_unsorted/IntegerArray.txt') as f:
+    with open('/path_to_unsorted/IntegerArray.txt') as f:
         lines = list(map(int, f.readlines()))
+    # or just:
+    #lines = [1,5,8,2,6,9,4,7,3,11,14,10,12,13]
     si = QuickSort(lines)
     si.sort()
     #print('output:', si.sortedOut)
