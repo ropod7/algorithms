@@ -1,9 +1,8 @@
 #!/usr/bin/env/python3
 
 # In this script case using Divide & Conquer paradigm, to:
-# 1. Sort list objects (MergeSort, QuickSort, SplitInversions) and
+# 1. Sort list objects (MergeSort, QuickSort) and
 # 2. Count number of SplitInversions in unsorted list object
-# by RecursiveTree, MergeSort and QuickSort algorithms
 
 import os
 import random
@@ -15,7 +14,7 @@ class MergeSort(object):
     def __init__(self, obj):
         self.obj = obj
         self.over = max(obj) + 1         # to define over value in merge sort
-        self.sortedIn = sorted(obj)     # defined to compare output result
+        self.sortedIn = sorted(obj)      # defined to compare output result
 
     def sort(self):
         time = datetime.datetime.now()
