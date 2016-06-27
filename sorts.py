@@ -1,9 +1,15 @@
 #!/usr/bin/env/python3
 
-# In this script case using Divide & Conquer paradigm, to:
-# 1. Sort list objects and
-# 2. Count number of SplitInversions in unsorted list object
-# by RecursiveTree, MergeSort and QuickSort algorithms
+# In this script case using Divide & Conquer paradigm, to define recursive
+# tree algorithm to:
+# 1. Sort list objects
+# 2. Count number of SplitInversions in unsorted list object using MergeSort
+# 3. Count number of comparsions in unsorted list object using QuickSort
+#   - Four types of pivot choices for all recursively partitioned subobjects:
+#       * as first element
+#       * as 'median-of-three' element
+#       * as last element
+#       * as randomly choosen element
 
 import os
 import random
@@ -78,28 +84,63 @@ class SplitInversions(MergeSort):
 # running time is O(nlog(n))
 # can't apply Master Method [random, unbalanced subproblems]
 class QuickSort(BaseSort):
+    comparsions = 0
+
+    def sort(self, pivot='rand'):
+        """Four types of pivot choice for all recursively partitioned
+        subobjects:
+        1. as first element: s.sort(pivot='first')
+        2. as 'median-of-three' element: s.sort(pivot='median')
+        3. as last element: s.sort(pivot='last')
+        4. as randomly choosen element: s.sort([pivot='rand'])"""
+        choices = ['first', 'median', 'last', 'rand']
+        assert pivot in choices
+        self.choice = pivot
+        time = datetime.datetime.now()
+        self.sortedOut = self._recursiveSort(self.obj)
+        print('executed at:', datetime.datetime.now()-time)
 
     def _swap(self, item0, item1):
         return item1, item0
 
+    def _get_median(self, obj, half):
+        lenobj = len(obj)
+        if lenobj > 2:
+            odd = lenobj % 2
+            left, right = obj[0],  obj[-1]
+            mid = obj[half] if odd else obj[half-1]
+            s = {left, mid, right}                                      # define set 'of-three'
+            median = [i for i in s - {min(s), max(s)}][0]               # get 'median-of-three'
+        else:
+            median = min(obj)
+        return obj.index(median)                                        # return index of median
+
     def _choose_pivot(self, obj):
-        half = len(obj)//2
-        index = random.randrange(0, half+1)                 # choosen randomly from 50% of n
-        obj[0], obj[index] = self._swap(obj[0], obj[index]) # place pivot to the 0 pos
+        choice = self.choice
+        half = len(obj) // 2
+        if choice is 'median':
+            index = self._get_median(obj, half)
+        elif choice is 'last':
+            index = -1
+        elif choice is 'rand':
+            index = random.randrange(0, half+1)                         # choosen randomly from 50% of n
+        obj[0], obj[index] = self._swap(obj[0], obj[index])             # place pivot to the 0 pos
         return obj
 
     def _recursiveSort(self, obj):
         n = len(obj)
         if n == 1: return
-        obj = self._choose_pivot(obj)             # every pivot compared in input array exactly once
+        choice = self.choice
+        obj = obj if choice is 'first' else self._choose_pivot(obj)     # every pivot compared in input array exactly once
         obj, index = self._partitionSort(obj, n)
-        a, b = obj[:index], obj[index+1:]         # split partitions around pivot
+        a, b = obj[:index], obj[index+1:]                               # split partitions around pivot
         obj[:index], obj[index+1:] = self._recursive_comb(a, b)
         return obj
 
     def _partitionSort(self, obj, n):
         i = 1
         pivot = obj[0]
+        self.comparsions += len(obj)-1
         for j in range(1, n):
             if obj[j] < pivot:
                 obj[j], obj[i] = self._swap(obj[j], obj[i])
@@ -107,13 +148,20 @@ class QuickSort(BaseSort):
         obj[0], obj[i-1] = self._swap(obj[0], obj[i-1])
         return obj, i-1
 
+    def repr_results(self):
+        data = super(QuickSort, self).repr_results()
+        data += '\nNum of comparsions: {0}'.format(self.comparsions)
+        return data
+
 if __name__ == '__main__':
     with open('IntegerArray.txt') as f:
         lines = list(map(int, f.readlines()))
     # or just:
-    #lines = [1,5,8,2,6,9,4,7,3,11,14,10,12,13]
-    si = QuickSort(lines)
-    si.sort()
-    #print('output:', si.sortedOut)
-    print(si.repr_results())
+    #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13]
+    s = QuickSort(lines)
+    s.sort()
+    #s.sort(pivot='median')
+    #s.sort(pivot='last')
+    #s.sort(pivot='rand')
+    print(s.repr_results())
 
