@@ -1,7 +1,7 @@
 #!/usr/bin/env/python3
 
 # In this script case using Divide & Conquer paradigm, to define recursive
-# tree algorithm to:
+# tree algorithm in following tasks:
 # 1. Sort list objects
 # 2. Count number of SplitInversions in unsorted list object using MergeSort
 # 3. Count number of comparsions in unsorted list object using QuickSort
