@@ -21,8 +21,8 @@ class BaseSort(object):
 
     def __init__(self, obj):
         self.obj = obj
-        self.over = max(obj) + 1         # to define over value in merge sort
-        self.sortedIn = sorted(obj)      # defined to compare output result
+        self.over = max(obj) + 1                                        # to define over value in merge sort
+        self.sortedIn = sorted(obj)                                     # defined to compare output result
 
     def sort(self):
         time = datetime.now()
@@ -35,8 +35,8 @@ class BaseSort(object):
         return data
 
     def _recursive_comb(self, a, b):
-        a = self._recursiveSort(a) if len(a) > 1 else a  # recursive call for 1st half
-        b = self._recursiveSort(b) if len(b) > 1 else b  # recursive call for 2nd half
+        a = self._recursiveSort(a) if len(a) > 1 else a                 # recursive call for 1st half
+        b = self._recursiveSort(b) if len(b) > 1 else b                 # recursive call for 2nd half
         return a, b
 
 # the running time is O(nlog(n))
@@ -162,7 +162,7 @@ class QuickSort(BaseSort):
 # the running time is O(n)
 class RSelect(QuickSort):
 
-    def sort(self, ith):
+    def search(self, ith):
         _assert = 'Order statistic must to be an integer'
         assert isinstance(ith, int), _assert
         self.choice = 'rand'
@@ -186,12 +186,12 @@ class RSelect(QuickSort):
         return data
 
 if __name__ == '__main__':
-    with open('IntegerArray.txt', 'r') as f:
+    with open('/media/roman/100GB/Downloads/IntegerArray.txt', 'r') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13]
     s = RSelect(lines)
-    s.sort(1230)
+    s.search(1230)
     #print(s.sortedOut)
     #s.sort(pivot='median')
     #s.sort(pivot='last')
