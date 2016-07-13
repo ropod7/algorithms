@@ -186,7 +186,7 @@ class RSelect(QuickSort):
         return data
 
 if __name__ == '__main__':
-    with open('/media/roman/100GB/Downloads/IntegerArray.txt', 'r') as f:
+    with open('IntegerArray.txt', 'r') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13]
