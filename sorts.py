@@ -39,7 +39,7 @@ class BaseSort(object):
         b = self._recursiveSort(b) if len(b) > 1 else b  # recursive call for 2nd half
         return a, b
 
-# running time is O(nlog(n))
+# the running time is O(nlog(n))
 class MergeSort(BaseSort):
 
     def _get_value(self, obj, i):
@@ -82,7 +82,7 @@ class SplitInversions(MergeSort):
         data += '\nSplit inversions: {0}'.format(self.inversions)
         return data
 
-# running time is O(nlog(n))
+# the running time is O(nlog(n))
 # can't apply Master Method [random, unbalanced subproblems]
 class QuickSort(BaseSort):
     comparsions = 0
@@ -159,6 +159,7 @@ class QuickSort(BaseSort):
         data += '\nNum of comparsions: {0}'.format(self.comparsions)
         return data
 
+# the running time is O(n)
 class RSelect(QuickSort):
 
     def sort(self, ith):
@@ -173,7 +174,7 @@ class RSelect(QuickSort):
     def _recursiveSort(self, obj, i=None):
         n = len(obj)
         if n is 1: return obj[0]
-        obj = self._choose_pivot(obj)                                   # every pivot compared in input array exactly once
+        obj = self._choose_pivot(obj)
         obj, j = self._partitionSort(obj, n)
         if j is i-1:  return obj[j]
         elif j > i-1: return self._recursiveSort(obj[:j], i)
