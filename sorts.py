@@ -2,7 +2,7 @@
 
 # In this script case using Divide & Conquer paradigm, to define recursive
 # tree algorithm in following tasks:
-# 1. Sort list objects
+# 1. Sort list objects using MergeSort and QuickSort algorithms
 # 2. Count number of SplitInversions in unsorted list object using MergeSort
 # 3. Count number of comparsions in unsorted list object using QuickSort
 #   - Four types of pivot choices for all recursively partitioned subobjects:
@@ -10,10 +10,11 @@
 #       * as 'median-of-three' element
 #       * as last element
 #       * as randomly choosen element
+# 4. Getting ith order statistics in usorted list object using Randomized Selection
 
 import os
 import random
-import datetime
+from datetime import datetime
 
 class BaseSort(object):
     sortedOut = []
@@ -24,9 +25,9 @@ class BaseSort(object):
         self.sortedIn = sorted(obj)      # defined to compare output result
 
     def sort(self):
-        time = datetime.datetime.now()
+        time = datetime.now()
         self.sortedOut = self._recursiveSort(self.obj)
-        print('executed at:', datetime.datetime.now()-time)
+        print('executed in:', datetime.now()-time)
 
     def repr_results(self):
         is_sorted = self.sortedOut == self.sortedIn
@@ -93,18 +94,19 @@ class QuickSort(BaseSort):
         2. as 'median-of-three' element: s.sort(pivot='median')
         3. as last element: s.sort(pivot='last')
         4. as randomly choosen element: s.sort([pivot='rand'])"""
+
         choices = ['first', 'median', 'last', 'rand']
         assert pivot in choices
         self.choice = pivot
-        time = datetime.datetime.now()
+        time = datetime.now()
         self.sortedOut = self._recursiveSort(self.obj)
-        print('executed at:', datetime.datetime.now()-time)
+        print('executed at:', datetime.now()-time)
 
     def _swap(self, item0, item1):
         return item1, item0
 
-    def _get_median(self, obj, half):
-        lenobj = len(obj)
+    def _get_median(self, obj, lenobj):
+        half = lenobj // 2
         if lenobj > 2:
             odd = lenobj % 2
             left, right = obj[0],  obj[-1]
@@ -117,14 +119,18 @@ class QuickSort(BaseSort):
 
     def _choose_pivot(self, obj):
         choice = self.choice
-        half = len(obj) // 2
+        lenobj = len(obj)
         if choice is 'median':
-            index = self._get_median(obj, half)
+            index = self._get_median(obj, lenobj)
         elif choice is 'last':
             index = -1
         elif choice is 'rand':
-            index = random.randrange(0, half+1)                         # choosen randomly from 50% of n
-        obj[0], obj[index] = self._swap(obj[0], obj[index])             # place pivot to the 0 pos
+            try:
+                index = random.randrange(0, lenobj)
+            except ValueError:
+                index = random.randrange(0, lenobj+1)
+        if choice is not 'rand':
+            obj[0], obj[index] = self._swap(obj[0], obj[index])         # place pivot to the 0 pos
         return obj
 
     def _recursiveSort(self, obj):
@@ -153,13 +159,39 @@ class QuickSort(BaseSort):
         data += '\nNum of comparsions: {0}'.format(self.comparsions)
         return data
 
+class RSelect(QuickSort):
+
+    def sort(self, ith):
+        _assert = 'Order statistic must to be an integer'
+        assert isinstance(ith, int), _assert
+        self.choice = 'rand'
+        self.ith = ith
+        time = datetime.now()
+        self.order_stat = self._recursiveSort(self.obj, i=ith)
+        print('Executed in:', datetime.now() - time)
+
+    def _recursiveSort(self, obj, i=None):
+        n = len(obj)
+        if n is 1: return obj[0]
+        obj = self._choose_pivot(obj)                                   # every pivot compared in input array exactly once
+        obj, j = self._partitionSort(obj, n)
+        if j is i-1:  return obj[j]
+        elif j > i-1: return self._recursiveSort(obj[:j], i)
+        else: return self._recursiveSort(obj[j+1:], i=i-1-j)
+
+    def repr_results(self):
+        data = super(RSelect, self).repr_results()
+        data += '\nThe {0}th order statistics is: {1}'.format(self.ith, self.order_stat)
+        return data
+
 if __name__ == '__main__':
-    with open('IntegerArray.txt') as f:
+    with open('IntegerArray.txt', 'r') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13]
-    s = QuickSort(lines)
-    s.sort()
+    s = RSelect(lines)
+    s.sort(1230)
+    #print(s.sortedOut)
     #s.sort(pivot='median')
     #s.sort(pivot='last')
     #s.sort(pivot='rand')
