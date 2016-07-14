@@ -4,4 +4,5 @@ At this moment available following types of algorithms:
 - Quick Sort
 - Recursive Tree
 - Randomized Selection
+- Deterministic Selection
 - [ To be continued ]
