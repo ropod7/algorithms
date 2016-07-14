@@ -10,7 +10,9 @@
 #       * as 'median-of-three' element
 #       * as last element
 #       * as randomly choosen element
-# 4. Getting ith order statistics in usorted list object using Randomized Selection
+# 4. Getting ith order statistics in unsorted list object using:
+#   - Randomized Selection algorithm
+#   - Deterministic Selection algorithm (the median of medians)
 
 import os
 import random
@@ -25,9 +27,8 @@ class BaseSort(object):
         self.sortedIn = sorted(obj)                                     # defined to compare output result
 
     def sort(self):
-        time = datetime.now()
         self.sortedOut = self._recursiveSort(self.obj)
-        print('executed in:', datetime.now()-time)
+        return self.sortedOut
 
     def repr_results(self):
         is_sorted = self.sortedOut == self.sortedIn
@@ -105,9 +106,10 @@ class QuickSort(BaseSort):
     def _swap(self, item0, item1):
         return item1, item0
 
-    def _get_median(self, obj, lenobj):
+    def _get_median(self, obj, ns=3):
+        lenobj = len(obj)
         half = lenobj // 2
-        if lenobj > 2:
+        if lenobj >= ns:
             odd = lenobj % 2
             left, right = obj[0],  obj[-1]
             mid = obj[half] if odd else obj[half-1]
@@ -121,7 +123,7 @@ class QuickSort(BaseSort):
         choice = self.choice
         lenobj = len(obj)
         if choice is 'median':
-            index = self._get_median(obj, lenobj)
+            index = self._get_median(obj)
         elif choice is 'last':
             index = -1
         elif choice is 'rand':
@@ -160,38 +162,63 @@ class QuickSort(BaseSort):
         return data
 
 # the running time is O(n)
-class RSelect(QuickSort):
+class RSelect(QuickSort):                                               # Randomized Selection
 
     def search(self, ith):
-        _assert = 'Order statistic must to be an integer'
-        assert isinstance(ith, int), _assert
+        _assertions = ['Order statistic must to be an integer',
+                       'iterable object much shorter']
+        assert isinstance(ith, int), _assertions[0]
+        assert ith <= len(self.obj), _assertions[1]
         self.choice = 'rand'
         self.ith = ith
         time = datetime.now()
-        self.order_stat = self._recursiveSort(self.obj, i=ith)
+        self.order_stat = self._recursiveSelect(self.obj, ith)
         print('Executed in:', datetime.now() - time)
 
-    def _recursiveSort(self, obj, i=None):
+    def _partitioning(self, obj, n, i):
+        obj, j = self._partitionSort(obj, n)
+        if j is i-1:  return obj[j]
+        elif j > i-1: return self._recursiveSelect(obj[:j], i)
+        else: return self._recursiveSelect(obj[j+1:], i-1-j)
+
+    def _recursiveSelect(self, obj, i):
         n = len(obj)
         if n is 1: return obj[0]
         obj = self._choose_pivot(obj)
-        obj, j = self._partitionSort(obj, n)
-        if j is i-1:  return obj[j]
-        elif j > i-1: return self._recursiveSort(obj[:j], i)
-        else: return self._recursiveSort(obj[j+1:], i=i-1-j)
+        return self._partitioning(obj, n, i)
 
     def repr_results(self):
         data = super(RSelect, self).repr_results()
-        data += '\nThe {0}th order statistics is: {1}'.format(self.ith, self.order_stat)
+        data += '\nThe {0}th order statistics is: {1}'.format(self.ith,
+            self.order_stat)
         return data
+
+# the running time is linear
+class DSelect(RSelect):                                                 # Deterministic Selection
+
+    def _choose_pivot(self, obj):
+        ns = 5
+        if len(obj) <= ns: return self._get_median(obj)                 # return index of median of medians
+        parts = [obj[i:i+ns] for i in range(0, len(obj), ns)][:-1]      # logically break list into n/5 groups of size 5 each
+        sortedp = [MergeSort(nl).sort() for nl in parts]                # sort each group using MergeSort
+        indexes = list(map(self._get_median, sortedp))                  # get indexes of medians of each input list
+        medians = [sortedp[i][indexes[i]] for i in range(len(indexes))] # set medians from indexes
+        return self._choose_pivot(medians)                              # recursively compute median of medians
+
+    def _recursiveSelect(self, obj, i):
+        n = len(obj)
+        index = self._choose_pivot(obj)
+        obj[0], obj[index] = self._swap(obj[0], obj[index])             # place pivot to 0 position
+        return self._partitioning(obj, n, i)
 
 if __name__ == '__main__':
     with open('IntegerArray.txt', 'r') as f:
         lines = list(map(int, f.readlines()))
     # or just:
-    #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13]
-    s = RSelect(lines)
-    s.search(1230)
+    #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48]
+    #lines = [10, 8, 2, 5]
+    s = DSelect(lines)
+    s.search(1)
     #print(s.sortedOut)
     #s.sort(pivot='median')
     #s.sort(pivot='last')
