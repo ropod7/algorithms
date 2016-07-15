@@ -75,7 +75,7 @@ class DSelect(RSelect):                                                 # Determ
         return self._partitioning(obj, n, i)
 
 if __name__ == '__main__':
-    with open('/media/roman/100GB/Downloads/IntegerArray.txt', 'r') as f:
+    with open('IntegerArray.txt', 'r') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48]
@@ -83,7 +83,4 @@ if __name__ == '__main__':
     s = DSelect(lines)
     s.select(40000)
     #print(s.sortedOut)
-    #s.sort(pivot='median')
-    #s.sort(pivot='last')
-    #s.sort(pivot='rand')
     print(s.repr_results())
