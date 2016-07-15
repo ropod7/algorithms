@@ -27,8 +27,10 @@ class BaseSort(object):
         self.sortedIn = sorted(obj)                                     # defined to compare output result
 
     def sort(self):
-        self.sortedOut = self._recursiveSort(self.obj)
-        return self.sortedOut
+        obj = self.obj
+        output = self._recursiveSort(obj) if len(obj) > 1 else obj
+        self.sortedOut = output
+        return output
 
     def repr_results(self):
         is_sorted = self.sortedOut == self.sortedIn
@@ -106,14 +108,15 @@ class QuickSort(BaseSort):
     def _swap(self, item0, item1):
         return item1, item0
 
-    def _get_median(self, obj, ns=3):
+    def _get_median(self, obj):
         lenobj = len(obj)
         half = lenobj // 2
-        if lenobj >= ns:
+        if lenobj >= 3:
             odd = lenobj % 2
             left, right = obj[0],  obj[-1]
             mid = obj[half] if odd else obj[half-1]
             s = {left, mid, right}                                      # define set 'of-three'
+            print(s)
             median = [i for i in s - {min(s), max(s)}][0]               # get 'median-of-three'
         else:
             median = min(obj)
@@ -164,7 +167,7 @@ class QuickSort(BaseSort):
 # the running time is O(n)
 class RSelect(QuickSort):                                               # Randomized Selection
 
-    def search(self, ith):
+    def select(self, ith):
         _assertions = ['Order statistic must to be an integer',
                        'iterable object much shorter']
         assert isinstance(ith, int), _assertions[0]
@@ -196,29 +199,38 @@ class RSelect(QuickSort):                                               # Random
 # the running time is linear
 class DSelect(RSelect):                                                 # Deterministic Selection
 
+    def _get_median(self, obj):
+        lenobj = len(obj)
+        obj = MergeSort(obj).sort()
+        half = lenobj // 2
+        if lenobj >= 3:
+            odd = lenobj % 2
+            return obj[half] if odd else obj[half-1]
+        else:
+            return min(obj) if lenobj == 2 else obj[0]
+                                                                        # return index of median
     def _choose_pivot(self, obj):
-        ns = 5
-        if len(obj) <= ns: return self._get_median(obj)                 # return index of median of medians
-        parts = [obj[i:i+ns] for i in range(0, len(obj), ns)][:-1]      # logically break list into n/5 groups of size 5 each
-        sortedp = [MergeSort(nl).sort() for nl in parts]                # sort each group using MergeSort
-        indexes = list(map(self._get_median, sortedp))                  # get indexes of medians of each input list
-        medians = [sortedp[i][indexes[i]] for i in range(len(indexes))] # set medians from indexes
+        ns = 5                                                          # number of length each part
+        if len(obj) < ns: return self._get_median(obj)                  # return index of median of medians
+        parts = [obj[i:i+ns] for i in range(0, len(obj), ns)]           # logically break list into n/5 groups of size 5 each
+        medians = list(map(self._get_median, parts))                    # get indexes of medians of each input list
         return self._choose_pivot(medians)                              # recursively compute median of medians
 
     def _recursiveSelect(self, obj, i):
         n = len(obj)
-        index = self._choose_pivot(obj)
+        pivot = self._choose_pivot(obj)
+        index = obj.index(pivot)
         obj[0], obj[index] = self._swap(obj[0], obj[index])             # place pivot to 0 position
         return self._partitioning(obj, n, i)
 
 if __name__ == '__main__':
-    with open('IntegerArray.txt', 'r') as f:
+    with open('/media/roman/100GB/Downloads/IntegerArray.txt', 'r') as f:
         lines = list(map(int, f.readlines()))
     # or just:
     #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48]
     #lines = [10, 8, 2, 5]
     s = DSelect(lines)
-    s.search(1)
+    s.select(4)
     #print(s.sortedOut)
     #s.sort(pivot='median')
     #s.sort(pivot='last')
