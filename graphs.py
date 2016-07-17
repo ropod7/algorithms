@@ -6,20 +6,19 @@ import random
 class RContraction(object):                                             # Random Contraction Algorithm
 
     def __init__(self, lines):
-        self.lines = lines
         self.F = 0                                                      # number of edges crossing (A, B)
         self._represent_lines(lines)
 
     def _represent_lines(self, lines):
-        self.n = [int(line[0]) for line in lines]
+        self.n = [int(line[0]) for line in lines]                       # list of vertices
         self.m = m = []
         for line in lines:
             for item in line[1:]:
                 a, b = [int(line[0]), int(item)]
                 if [a, b] in m or [b, a] in m:
-                    continue
+                    continue                                            # exclude duplicates
                 else:
-                    m.append([a, b])
+                    m.append([a, b])                                    # list of edges
 
     def _contracter(self, n, m):
         index = random.randrange(0, len(m))                             # pick a remaining edge (u,v) uniformly at random
@@ -46,7 +45,7 @@ if __name__ == '__main__':
     with open('data/Simplegraphs.txt') as f:
         lines = [line[:-2].split('\t') for line in f.readlines()]
     # 0 position of each list is a vertex label, that form an edge with each following
-    #lines = [[1, 2, 5, 4], [2, 3, 4, 1], [3, 2, 5], [4, 2, 1, 5], [5, 1, 3, 4],]   
+    #lines = [[1, 2, 5, 4], [2, 3, 4, 1], [3, 2, 5], [4, 2, 1, 5], [5, 1, 3, 4],]
     cuts = 0
     for i in range(10):
         rc = RContraction(lines)
