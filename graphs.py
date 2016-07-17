@@ -32,9 +32,8 @@ class RContraction(object):                                             # Random
             if vmax in edge:
                 edge[edge.index(vmax)] = vmin                           # merge (or “contract”) u and v into a single vertex
             k += [edge] if edge[0] != edge[1] else []                   # compare vertices and remove self-loops if equals
-        if len(n) > 2:
-            return self._contracter(n, k)                               # While there are more than 2 vertices, run recursively
-        return n, k                                                     # return cut represented by final 2 vertices
+        return self._contracter(n, k) if len(n) > 2 else (n, k)         # While there are more than 2 vertices, run recursively,
+                                                                        # or return cut represented by final 2 vertices
 
     def merge(self):
         self.n, self.m = self._contracter(self.n, self.m)
