@@ -45,7 +45,8 @@ class RContraction(object):                                             # Random
 if __name__ == '__main__':
     with open('data/Simplegraphs.txt') as f:
         lines = [line[:-2].split('\t') for line in f.readlines()]
-    #lines = [[1, 2, 5, 4], [2, 3, 4, 1], [3, 2, 5], [4, 2, 1, 5], [5, 1, 3, 4],]   # 0 position of every list is a vertex label, that form an edge with followings
+    # 0 position of every list is a vertex label, that form an edge with followings
+    #lines = [[1, 2, 5, 4], [2, 3, 4, 1], [3, 2, 5], [4, 2, 1, 5], [5, 1, 3, 4],]   
     cuts = 0
     for i in range(10):
         rc = RContraction(lines)
