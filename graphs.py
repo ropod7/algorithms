@@ -1,8 +1,8 @@
 #!/usr/bin/env/python3
 # -*- coding: utf-8 -*-
-# TODO: update algorithms to include explores of different data types
 import os
 import random
+import unittest
 from datetime import datetime
 
 class RContraction(object):                                             # Random Contraction Algorithm
@@ -39,7 +39,7 @@ class RContraction(object):                                             # Random
         self.F = len(self.m)                                            # number of edges crossing (A, B)
 
     def repr_results(self):
-        data = 'The minimum Graphs crossing edges: {0}'.format(self.F)
+        data = 'The minimum Graphs crossing edges: %d \n' % self.F
         return data
 
 class Graph(object):
@@ -114,15 +114,48 @@ class DFS(Graph):                                                       # Depth 
         return(string)
 
 if __name__ == '__main__':
-    with open('data/Simplegraphs.txt') as f:
-        lines = [list(map(int, line[:-2].split('\t'))) for line in f.readlines()]
-    #0 position of each list is a vertex label, that form an edge with each following
-    #lines = [[1, 2, 5, 4, 6], [2, 3, 4, 1], [3, 2, 5], [4, 2, 1, 5], [5, 1, 3, 4], [6, 1]]
-    # Disconnected graph
-    #lines = [[1, 3, 5], [2, 4], [3, 1, 5], [4, 2], [5, 1, 3, 7, 9], [6, 8, 10], [7, 5, 9], [8, 6, 10], [9, 5, 7], [10, 6, 8]]
-    t = datetime.now()
-    s = DFS(lines)
-    s.search(6)
-    #s.exploreConnected()
-    print(s.repr_results())
-    print(datetime.now() - t)
+    import unittest
+
+    class TestGraphs(unittest.TestCase):
+        def setUp(self):
+
+            with open('data/Simplegraphs.txt') as f:
+                graph = [list(map(int, line[:-2].split('\t'))) for line in f.readlines()]
+
+            self.connected = (
+                    (graph, 17),
+                    ([[1, 2, 5, 4, 6], [2, 3, 4, 1], [3, 2, 5], [4, 2, 1, 5], [5, 1, 3, 4], [6, 1]], 1),
+
+                )
+            self.disconnected = (
+                    [[1, 3, 5], [2, 4], [3, 1, 5], [4, 2], [5, 1, 3, 7, 9], [6, 8, 10], [7, 5, 9], [8, 6, 10], [9, 5, 7], [10, 6, 8]],
+            )
+
+        def test_RContraction(self):
+            for graph, crossing in self.connected:
+                leng = len(graph)
+                F = leng
+                n = leng//6 if leng//6 > 1 else leng
+                for i in range(n):
+                    contr = RContraction(graph)
+                    contr.merge()
+                    F = contr.F if contr.F < F else F
+                self.assertEqual(F, crossing)
+
+        def test_BFS_disconnected(self):
+            for graph in self.disconnected:
+                s = BFS(graph)
+                s.exploreConnected()
+
+        def test_BFS_connected(self):
+            for graph, crossing in self.connected:
+                s = BFS(graph)
+                s.search(6)
+
+        def test_DFS(self):
+            for graph, crossing in self.connected:
+                s = DFS(graph)
+                s.search(6)
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGraphs)
+    unittest.TextTestRunner(verbosity=2).run(suite)

@@ -21,15 +21,15 @@ class MaxMirror:                                                        # maximu
                 b = part[lenpart//2 + odd:]                             # define 2nd part
                 count = self._partitioning(a, b, odd=odd)               # explore 1st and 2nd part of partition
                 self.count = self._get_count(count)
-                if self.count * 2 < len(self.obj)//2:                   # check, is there reason to explore next sequence
+                if self.count * 2 < len(self.obj):                      # check, is there reason to explore next sequence
                     i -= count                                          # continue from items that not explored yet
                     continue
-                else:                                                   # if explored more than half of obj redefine maxmirror
+                else:
                     break
         # shift object 1 index to the left and explore recursively to
         # find higher maxmirror, if obj contains elements more than explored
-        # and if explored more than half of obj return final result
-        reason = len(self.obj)//2 > self.count
+        # or if explored more than length of obj return final result
+        reason = len(self.obj) > self.count
         return self.search(obj[1:]) if reason else self.count
 
     def _partitioning(self, a, b, shift=False, odd=0):
@@ -72,6 +72,7 @@ if __name__ == '__main__':
                 ([9, 1, 1, 4, 2, 1, 1, 1], 3),
                 # extra objects:
                 ([4, 6, 7, 2, 1, 3, 4, 1, 2, 4, 5, 7, 2, 1], 2),
+                ([1, 2, 1, 20, 21, 1, 2, 1, 2, 23, 24, 23, 2, 1, 2, 1, 2, 1, 2, 1, 25], 11),
             )
 
         def test_equals(self):
