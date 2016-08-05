@@ -19,23 +19,14 @@ import random
 from datetime import datetime
 
 class BaseSort(object):
-    sortedOut = []
 
     def __init__(self, obj):
         self.obj = obj
         self.over = max(obj) + 1                                        # to define over value in merge sort
-        self.sortedIn = sorted(obj)                                     # defined to compare output result
 
     def sort(self):
         obj = self.obj
-        output = self._recursiveSort(obj) if len(obj) > 1 else obj
-        self.sortedOut = output
-        return output
-
-    def repr_results(self):
-        is_sorted = self.sortedOut == self.sortedIn
-        data = 'List is sorted: {0}'.format(is_sorted)
-        return data
+        return self._recursiveSort(obj) if len(obj) > 1 else obj
 
     def _recursive_comb(self, a, b):
         a = self._recursiveSort(a) if len(a) > 1 else a                 # recursive call for 1st half
@@ -68,7 +59,7 @@ class MergeSort(BaseSort):
 
     def _recursiveSort(self, obj, si=False):
         n = len(obj)
-        if n == 1: return 0
+        if n is 1: return 0
         a, b = self._split(obj, n)
         a, b = self._recursive_comb(a, b)
         d = self._merge(a, b, n, si)
@@ -79,11 +70,6 @@ class SplitInversions(MergeSort):
 
     def _recursiveSort(self, *args):
         return super(SplitInversions, self)._recursiveSort(*args, si=True)
-
-    def repr_results(self):
-        data = super(SplitInversions, self).repr_results()
-        data += '\nSplit inversions: {0}'.format(self.inversions)
-        return data
 
 # the running time is O(nlog(n))
 # can't apply Master Method [random, unbalanced subproblems]
@@ -98,12 +84,10 @@ class QuickSort(BaseSort):
         3. as last element: s.sort(pivot='last')
         4. as randomly choosen element: s.sort([pivot='rand'])"""
 
-        choices = ['first', 'median', 'last', 'rand']
+        choices = ('first', 'median', 'last', 'rand')
         assert pivot in choices
         self.choice = pivot
-        time = datetime.now()
-        self.sortedOut = self._recursiveSort(self.obj)
-        print('executed at:', datetime.now()-time)
+        return self._recursiveSort(self.obj)
 
     def _swap(self, item0, item1):
         return item1, item0
@@ -129,17 +113,14 @@ class QuickSort(BaseSort):
         elif choice is 'last':
             index = -1
         elif choice is 'rand':
-            try:
-                index = random.randrange(0, lenobj)
-            except ValueError:
-                index = random.randrange(0, lenobj+1)
-        if choice is not 'rand':
-            obj[0], obj[index] = self._swap(obj[0], obj[index])         # place pivot to the 0 pos
+            index = random.randrange(0, lenobj)
+            index = index if index else 1
+        obj[0], obj[index] = self._swap(obj[0], obj[index])             # place pivot to the 0 pos
         return obj
 
     def _recursiveSort(self, obj):
         n = len(obj)
-        if n == 1: return
+        if n is 1: return
         choice = self.choice
         obj = obj if choice is 'first' else self._choose_pivot(obj)     # every pivot compared in input array exactly once
         obj, index = self._partitionSort(obj, n)
@@ -158,21 +139,41 @@ class QuickSort(BaseSort):
         obj[0], obj[i-1] = self._swap(obj[0], obj[i-1])
         return obj, i-1
 
-    def repr_results(self):
-        data = super(QuickSort, self).repr_results()
-        data += '\nNum of comparsions: {0}'.format(self.comparsions)
-        return data
-
 if __name__ == '__main__':
-    with open('data/IntegerArray.txt', 'r') as f:
-        lines = list(map(int, f.readlines()))
-    # or just:
-    #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48]
-    #lines = [10, 8, 2, 5]
-    s = QuickSort(lines)
-    #s.sort()
-    s.sort(pivot='median')
-    #s.sort(pivot='last')
-    #s.sort(pivot='rand')
-    print(s.repr_results())
+    import unittest
 
+    class TestSorts(unittest.TestCase):
+        def setUp(self):
+            with open('data/IntegerArray.txt', 'r') as f:
+                self.arrs = [
+                    list(map(int, f.readlines())),
+                    [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48],
+                    [10, 8, 2, 5],
+                ]
+
+        def runForloop(self, pivot):
+            for arr in self.arrs:
+                s = QuickSort(arr)
+                output = s.sort(pivot=pivot)
+                self.assertEqual(output, sorted(arr))
+
+        def test_MergeSort(self):
+            for arr in self.arrs:
+                sort = MergeSort(arr)
+                output = sort.sort()
+                self.assertEqual(output, sorted(arr))
+
+        def test_QuickSort_first(self):
+            self.runForloop('first')
+
+        def test_QuickSort_median(self):
+            self.runForloop('median')
+
+        def test_QuickSort_last(self):
+            self.runForloop('last')
+
+        def test_QuickSort_rand(self):
+            self.runForloop('rand')
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSorts)
+    unittest.TextTestRunner(verbosity=2).run(suite)
