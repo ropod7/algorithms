@@ -26,9 +26,9 @@ class MaxMirror:                                                        # maximu
                     continue
                 else:
                     break
-        # shift object 1 index to the left and explore recursively to
-        # find higher maxmirror, if obj contains elements more than explored
-        # or if explored more than length of obj return final result
+        # will shift object 1 index to the left and explore recursively to
+        # find higher maxmirror, if obj contains elements more than explored,
+        # or if explored more than length of obj, will return final result
         reason = len(self.obj) > self.count
         return self.search(obj[1:]) if reason else self.count
 
