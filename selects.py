@@ -8,7 +8,6 @@
 
 import os
 import random
-from datetime import datetime
 
 from sorts import QuickSort, MergeSort
 
@@ -18,15 +17,15 @@ class RSelect(QuickSort):                                               # Random
     Randomized Selection algorithm"""
 
     def select(self, ith):
+        ith += 1
         _assertions = ['Order statistic must to be an integer',
                        'iterable object much shorter']
         assert isinstance(ith, int), _assertions[0]
         assert ith <= len(self.obj), _assertions[1]
         self.choice = 'rand'
         self.ith = ith
-        time = datetime.now()
         self.order_stat = self._recursiveSelect(self.obj, ith)
-        print('Executed in:', datetime.now() - time)
+        return self.order_stat
 
     def _partitioning(self, obj, n, i):
         obj, j = self._partitionSort(obj, n)
@@ -39,12 +38,6 @@ class RSelect(QuickSort):                                               # Random
         if n is 1: return obj[0]
         obj = self._choose_pivot(obj)
         return self._partitioning(obj, n, i)
-
-    def repr_results(self):
-        data = super(RSelect, self).repr_results()
-        data += '\nThe {0}th order statistics is: {1}'.format(self.ith,
-            self.order_stat)
-        return data
 
 # the running time is linear O(n)
 class DSelect(RSelect):                                                 # Deterministic Selection
@@ -75,12 +68,29 @@ class DSelect(RSelect):                                                 # Determ
         return self._partitioning(obj, n, i)
 
 if __name__ == '__main__':
-    with open('data/IntegerArray.txt', 'r') as f:
-        lines = list(map(int, f.readlines()))
-    # or just:
-    #lines = [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48]
-    #lines = [10, 8, 2, 5]
-    s = DSelect(lines)
-    s.select(40000)
-    #print(s.sortedOut)
-    print(s.repr_results())
+    import unittest
+
+    class TestSelects(unittest.TestCase):
+        def setUp(self):
+            with open('data/IntegerArray.txt', 'r') as f:
+                self.arrs = (
+                    list(map(int, f.readlines())),
+                    [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48],
+                    [10, 8, 2, 5],
+                )
+
+        def runForloop(self, cls):
+            for arr in self.arrs:
+                lenarr = len(arr)
+                s = cls(arr)
+                order_stat = s.select(lenarr//2)
+                self.assertEqual(order_stat, sorted(arr)[lenarr//2])
+
+        def test_RSelect(self):
+            self.runForloop(RSelect)
+
+        def test_DSelect(self):
+            self.runForloop(DSelect)
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSelects)
+    unittest.TextTestRunner(verbosity=2).run(suite)
