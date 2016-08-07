@@ -77,6 +77,7 @@ if __name__ == '__main__':
                     list(map(int, f.readlines())),
                     [16,1,19,5,8,18,2,6,9,15,4,7,3,17,11,14,10,12,13,22,48],
                     [10, 8, 2, 5],
+                    [random.randrange(2**32) for i in range(2**16)],    # list of randomized generated integers
                 )
 
         def runForloop(self, cls):

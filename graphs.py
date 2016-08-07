@@ -80,10 +80,11 @@ class BFS(Graph):                                                       # Breadt
                     self.dist = 1 if v is vertex else self.dist + 1     # distance starting from 0
                     connected.append(w)
                     queue.append(w)
+        return connected
 
     def exploreConnected(self):
         self.explored = explored = []
-        self.pieces = pieces = 0
+        pieces = 0
         for group in self.obj:
             v = group[0]
             if v not in explored:
@@ -91,6 +92,7 @@ class BFS(Graph):                                                       # Breadt
                 explored.extend(sorted(self.connected))
                 pieces += 1
         self.pieces = pieces
+        return pieces
 
     def repr_results(self):
         string = super(BFS, self).repr_results()
@@ -128,34 +130,44 @@ if __name__ == '__main__':
 
                 )
             self.disconnected = (
-                    [[1, 3, 5], [2, 4], [3, 1, 5], [4, 2], [5, 1, 3, 7, 9], [6, 8, 10], [7, 5, 9], [8, 6, 10], [9, 5, 7], [10, 6, 8]],
+                    ([[1, 3, 5], [2, 4], [3, 1, 5], [4, 2], [5, 1, 3, 7, 9], [6, 8, 10], [7, 5, 9], [8, 6, 10], [9, 5, 7], [10, 6, 8]], 3),
+                    (self.connected[0][0], 1),
+                    (self.connected[1][0], 1),
+            )
+            self.directed = (
+
             )
 
-        def test_RContraction(self):
-            for graph, crossing in self.connected:
-                leng = len(graph)
-                F = leng
-                n = leng//6 if leng//6 > 1 else leng
-                for i in range(n):
-                    contr = RContraction(graph)
-                    contr.merge()
-                    F = contr.F if contr.F < F else F
-                self.assertEqual(F, crossing)
+        #def test_RContraction(self):
+            #for graph, crossing in self.connected:
+                #leng = len(graph)
+                #F = leng
+                #n = leng//6 if leng//6 > 1 else leng
+                #for i in range(n):
+                    #contr = RContraction(graph)
+                    #contr.merge()
+                    #F = contr.F if contr.F < F else F
+                #self.assertEqual(F, crossing)
 
         def test_BFS_disconnected(self):
-            for graph in self.disconnected:
+            for graph, result in self.disconnected:
                 s = BFS(graph)
-                s.exploreConnected()
+                pieces = s.exploreConnected()
+                self.assertEqual(pieces, result)                        # check count of disconnected parts of graph
 
         def test_BFS_connected(self):
             for graph, crossing in self.connected:
-                s = BFS(graph)
-                s.search(6)
+                lengraph = len(graph)
+                for i in range(1, lengraph+1):                          # start from every vertex contains in graph
+                    s = BFS(graph)
+                    connected = s.search(i)
+                    self.assertEqual(len(connected), lengraph)          # check, are all vertices explored
 
         def test_DFS(self):
             for graph, crossing in self.connected:
                 s = DFS(graph)
                 s.search(6)
+
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestGraphs)
     unittest.TextTestRunner(verbosity=2).run(suite)
